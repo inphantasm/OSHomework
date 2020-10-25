@@ -1,3 +1,26 @@
+1. 从CPU加电后执行的第一条指令开始，单步追踪BIOS的执行。
+    藉由：
+        set architecture i8086          // 将结构设置为i8086
+        target remote :1234             // 使用1234端口在gdb和qemu间建立联系
+    和make debug命令即可看到从0x0000fff0开始的指令。如果想看到具体的汇编指令，可以使用
+        x /2i $pc                       // x查看内存单元
+                                        // 2表示显示的内存单元个数，i表示指令地址格式
+                                        // $pc表示显示pc现在所处的位置
+    然后在此时，用si可以一步一步地让gdb执行下一条指令，每一条都可以反汇编。
+2. 在初始化位置0x7c00设置实地址断点,测试断点正常。
+    设置断点：
+    b *0x7c00
+    c
+    x /10i $pc
+    效果：
+    0x7c00      cli
+    0x7c01      cld
+    0x7c02      xor...
+3. 从0x7c00开始跟踪代码运行,将单步跟踪反汇编得到的代码与bootasm.S和 bootblock.asm进行比较。
+    基本一模一样。xor替换为xorw，mov替换为movw，in替换为inb，test替换为testb，mov替换为movb。
+4. 随便找个地方放了嘿。
+    0xff00大成功的说。直接进行一个屏的刷。
+// make lab1-mon 运行结果
 + cc kern/init/init.c
 + cc kern/libs/stdio.c
 + cc kern/libs/readline.c
@@ -53,3 +76,5 @@ gtk initialization failed
 
 "便**可以**在q.log中读到"call bootmain"前执行的命令"
 # 没读到。
+
+https://blog.csdn.net/moonsheep_liu/article/details/39099969
